@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Cơn Say</string>
+    <string name="slogan">Tỉnh táo đặt luật, Cơn Say giữ lời.</string>
+    <string name="accessibility_service_description">Cơn Say sử dụng dịch vụ này CHỈ để phát hiện khi bạn mở các ứng dụng đã chọn trong phiên bảo vệ để hiển thị lời nhắc. Dịch vụ tuyệt đối KHÔNG đọc nội dung màn hình hay thu thập dữ liệu cá nhân.</string>
+</resources>
