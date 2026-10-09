@@ -131,3 +131,34 @@ Nếu điện thoại chạy Android 13 trở lên và bạn cài đặt app qua
 1. **Không chặn tuyệt đối:** Cơn Say là công cụ hỗ trợ tâm lý và tự chủ bản thân, không phải ứng dụng MDM/Kiosk. Cơ chế Android không cho phép chặn 100% việc khởi động app khác mà không can thiệp sâu vào ROM/root.
 2. **Quản lý pin OEM (Xiaomi, Samsung, Oppo, Vivo):** Một số hãng tự động tắt ứng dụng chạy nền sau vài tiếng. Hãy bật "Không giới hạn pin" (No battery restrictions) và khóa đa nhiệm app Cơn Say để dịch vụ chạy xuyên suốt.
 3. **Môi trường hiện tại:** Môi trường dòng lệnh máy tính chưa cài đặt sẵn Android SDK/JDK CLI, do đó dự án đã được thiết kế sẵn sàng để mở trực tiếp trong Android Studio hoặc build với bất kỳ máy tính/CI có cài JDK 17+. Toàn bộ logic thời gian cốt lõi đã được kiểm thử với Unit Test độc lập.
+
+---
+
+## 8. CƠ CHẾ TỰ ĐỘNG CẬP NHẬT (AUTO-UPDATE) NHƯ ANTI-STALK
+
+Ứng dụng **Cơn Say** đã được tích hợp đầy đủ hệ thống tự động cập nhật không cần cài tay, hoạt động theo cơ chế **"1 chạm duy nhất"**:
+
+### 8.1. Cách thức hoạt động
+1. **GitHub Actions CI/CD (`.github/workflows/build-apk.yml`):**
+   - Mỗi khi bạn `git push` code lên nhánh `main`, GitHub sẽ tự động:
+     - Tăng số phiên bản tag `v1 -> v2 -> v3...`
+     - Biên dịch ra file APK đã được ký bởi keystore cố định (`keystore/debug.keystore`).
+     - Tự động xuất bản một **GitHub Release** kèm file `app-debug.apk`.
+2. **In-App Updater (`AppUpdater.kt`):**
+   - Mỗi lần mở ứng dụng Cơn Say, app tự động kiểm tra xem có Release mới trên GitHub hay không.
+   - Nếu có bản mới: Hiện banner **"🚀 Có bản cập nhật mới (vX)"**.
+   - Bấm **Cập nhật**: App tự động tải APK ngầm qua `DownloadManager` và mở ngay trình cài đặt hệ thống.
+   - Người dùng chỉ cần ấn nút **Cập nhật** của Android mà không cần phải vào trình duyệt tải file hay tìm APK thủ công!
+
+### 8.2. Hướng dẫn đẩy lên GitHub mới
+1. Tạo một repository mới trên GitHub (ví dụ đặt tên là `con-say` hoặc bất kỳ tên nào, để chế độ **Public**).
+2. Mở terminal tại thư mục `C:\Users\HP\Desktop\con-say`:
+   ```powershell
+   git remote add origin https://github.com/<tai-khoan-cua-ban>/con-say.git
+   git push -u origin main
+   ```
+3. Mở file `AppUpdater.kt` và đổi dòng:
+   ```kotlin
+   var githubRepo: String = "<tai-khoan-cua-ban>/con-say"
+   ```
+   Sau đó commit và push. GitHub sẽ tự động kích hoạt tiến trình build bản phát hành v1 đầu tiên cho bạn!
