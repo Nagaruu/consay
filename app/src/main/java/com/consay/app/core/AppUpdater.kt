@@ -1,4 +1,4 @@
-﻿package com.consay.app.core
+package com.consay.app.core
 
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
@@ -19,8 +19,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object AppUpdater {
-    // Tên repository GitHub chứa releases APK (Bạn có thể đổi sang username/repo của bạn)
-    var githubRepo: String = "Nagaruu/con-say"
+    // T�n repository GitHub ch?a releases APK (B?n c� th? d?i sang username/repo c?a b?n)
+    var githubRepo: String = "Nagaruu/consay"
     private const val APK_ASSET_NAME = "app-debug.apk"
 
     data class UpdateInfo(
@@ -49,16 +49,16 @@ object AppUpdater {
             conn.setRequestProperty("User-Agent", "ConSay-App")
 
             if (conn.responseCode != 200) {
-                return@withContext CheckResult.Error("Không tìm thấy bản phát hành (Mã: ${conn.responseCode})")
+                return@withContext CheckResult.Error("Kh�ng t�m th?y b?n ph�t h�nh (M�: ${conn.responseCode})")
             }
 
             val body = conn.inputStream.bufferedReader().use { it.readText() }
             val json = JSONObject(body)
             val tagName = json.optString("tag_name", "")
             val tagNumber = tagName.removePrefix("v").toIntOrNull() ?: 0
-            val bodyNotes = json.optString("body", "Bản cập nhật mới")
+            val bodyNotes = json.optString("body", "B?n c?p nh?t m?i")
 
-            // Tìm asset APK
+            // T�m asset APK
             val assets = json.optJSONArray("assets")
             var downloadUrl = ""
             if (assets != null) {
@@ -73,7 +73,7 @@ object AppUpdater {
             }
 
             if (downloadUrl.isBlank()) {
-                return@withContext CheckResult.Error("Release chưa có file APK đính kèm.")
+                return@withContext CheckResult.Error("Release chua c� file APK d�nh k�m.")
             }
 
             val currentVersionCode = BuildConfig.VERSION_CODE
@@ -90,12 +90,12 @@ object AppUpdater {
                 CheckResult.UpToDate
             }
         } catch (e: Exception) {
-            CheckResult.Error("Lỗi kết nối kiểm tra cập nhật: ${e.localizedMessage}")
+            CheckResult.Error("L?i k?t n?i ki?m tra c?p nh?t: ${e.localizedMessage}")
         }
     }
 
     /**
-     * Tự động tải file APK bằng DownloadManager và mở cửa sổ cài đặt của hệ điều hành.
+     * T? d?ng t?i file APK b?ng DownloadManager v� m? c?a s? c�i d?t c?a h? di?u h�nh.
      */
     fun startUpdateDownload(context: Context, updateInfo: UpdateInfo) {
         val fileName = "con-say-${updateInfo.tag}.apk"
@@ -106,8 +106,8 @@ object AppUpdater {
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val request = DownloadManager.Request(Uri.parse(updateInfo.apkUrl)).apply {
-            setTitle("Đang tải Cơn Say ${updateInfo.tag}...")
-            setDescription("Tự động tải bản cập nhật mới nhất")
+            setTitle("�ang t?i Con Say ${updateInfo.tag}...")
+            setDescription("T? d?ng t?i b?n c?p nh?t m?i nh?t")
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             setDestinationUri(Uri.fromFile(destinationFile))
             setMimeType("application/vnd.android.package-archive")
@@ -115,7 +115,7 @@ object AppUpdater {
 
         val downloadId = downloadManager.enqueue(request)
 
-        // Đăng ký Receiver chờ tải xong để lập tức kích hoạt cài đặt
+        // �ang k� Receiver ch? t?i xong d? l?p t?c k�ch ho?t c�i d?t
         val onCompleteReceiver = object : BroadcastReceiver() {
             override fun onReceive(recvContext: Context, intent: Intent) {
                 val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
@@ -144,12 +144,12 @@ object AppUpdater {
     }
 
     /**
-     * Kích hoạt trình cài đặt hệ thống (Người dùng chỉ cần bấm 1 chạm vào nút "Cập nhật").
+     * K�ch ho?t tr�nh c�i d?t h? th?ng (Ngu?i d�ng ch? c?n b?m 1 ch?m v�o n�t "C?p nh?t").
      */
     fun triggerApkInstall(context: Context, apkFile: File) {
         if (!apkFile.exists()) return
 
-        // Kiểm tra quyền cài đặt từ nguồn ngoài trên Android 8.0+
+        // Ki?m tra quy?n c�i d?t t? ngu?n ngo�i tr�n Android 8.0+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!context.packageManager.canRequestPackageInstalls()) {
                 val grantIntent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
